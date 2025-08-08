@@ -9,7 +9,7 @@ async function connectDB(){
   }
   
   catch(error){
-    console.error("MongoDB connection error: ", error)
+    console.error("db/index.js  MongoDB connection error: ", error)
     process.exit(1)
   }
   
