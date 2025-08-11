@@ -1,5 +1,3 @@
-
-
 const asyncHandler = (requestHandler) => {
   
   return (req,res,next) => {
@@ -7,11 +5,13 @@ const asyncHandler = (requestHandler) => {
     .resolve(
       requestHandler(req,res,next)
     )
-    // try changing to reject
-    .catch((err) => next(err))
+    // can use .catch()
+    .reject((err) => next(err))
   }
   
 }
+
+export { asyncHandler}
 
 
 /*

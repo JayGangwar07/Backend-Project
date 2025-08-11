@@ -17,6 +17,8 @@ connectDB()
     
     console.log("Server Is Running at: ", process.env.PORT)
     
+    console.log("Access API at: ", "http://localhost:8080")
+    
   })
   
 })
