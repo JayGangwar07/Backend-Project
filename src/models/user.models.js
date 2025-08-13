@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     trim: true
   },
   
-  coverImg: {
+  coverImage: {
     type: String,
   },
   
@@ -58,8 +58,8 @@ const userSchema = new mongoose.Schema({
 userSchema.pre("save", async function(next){
   
   // Hash only when password is altered
-  if (this.isModified(password)){
-    await this.password = bcrypt.hash(this.password,11)
+  if (this.isModified("password")){
+    this.password = await bcrypt.hash(this.password,11)
   }
   
   next()

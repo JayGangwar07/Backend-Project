@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary"
 import fs from "fs"
 
-// Transfer to index.js
+// Transfer to index.js if not working
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -18,8 +18,9 @@ async function uploadOnCloudinary(localFilePath){
       resource_type: "auto"
     })
     //after upload
-    console.log(response.url)
-    
+    //console.log(response.url)
+    fs.unlinkSync(localFilePath)
+    //console.log(response)
     return response
   }
   

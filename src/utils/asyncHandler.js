@@ -5,8 +5,8 @@ const asyncHandler = (requestHandler) => {
     .resolve(
       requestHandler(req,res,next)
     )
-    // can use .catch()
-    .reject((err) => next(err))
+    
+    .catch((err) => next(err))
   }
   
 }
