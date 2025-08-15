@@ -205,11 +205,41 @@ const logoutUser = asyncHandler( async (req,res) => {
   return res
   .status(200)
   .clearCookie("accessToken", options)
+  .clearCookie("refreshToken", options)
   .json(new ApiResponse(200, {}, "User Logged Out"))
+})
+
+const refreshAccessToken = asyncHandler( async (req,res) => {
+  
+  /*    STEPS    */
+  // Take accessToken from cookie
+  // Use accessToken to get MongoDB user
+  
+  // ↑ From auth middleware
+  
+  // Use generateAccessAndRefreshTokens() to get accessToken and refreshToken
+  // Set new refreshToken and accessToken in cookie
+  
+  const user = await User.findById(req.user._id)
+  
+  if (!user){
+    throw new ApiError(400, "Unauthorized Request")
+  }
+  
+  const { refreshToken, accessToken } = await generateAccessAndRefreshTokens()
+  
+  return res
+  .status(200)
+  .clearCookie("accessToken", options)
+  .clearCookie("refreshToken", options)
+  .cookie("accessToken", accessToken, options)
+  .cookie("refreshToken", refreshToken, options)
+  
 })
 
 export {
   registerUser,
   loginUser,
-  logoutUser
+  logoutUser,
+  refreshAccessToken
   }
