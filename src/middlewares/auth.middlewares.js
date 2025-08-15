@@ -7,8 +7,7 @@ export const verifyJwt = asyncHandler( async (req,res,next) => {
   
   // Authorization Bearer <token>
   try{
-    const {token} = req.body
-    //const token = req.cookies.accessToken || req.header("Authorization")?.replace("Bearer ", "")
+    const token = req.cookies.accessToken || req.header("Authorization")?.replace("Bearer ", "")
   
   if (!token){
     throw new ApiError(409, "Couldn't find token")
@@ -16,7 +15,7 @@ export const verifyJwt = asyncHandler( async (req,res,next) => {
   
   console.log(token)
   
-  const decodedToken = jwt.verify(token, 123)
+  const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
   
   if (!decodedToken){
     throw new ApiError(401,"Invalid Token")
