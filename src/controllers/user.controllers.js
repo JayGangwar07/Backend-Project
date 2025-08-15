@@ -220,18 +220,10 @@ const refreshAccessToken = asyncHandler( async (req,res) => {
   // Use generateAccessAndRefreshTokens() to get accessToken and refreshToken
   // Set new refreshToken and accessToken in cookie
   
-  const user = await User.findById(req.user._id)
-  
-  if (!user){
-    throw new ApiError(400, "Unauthorized Request")
-  }
-  
-  const { refreshToken, accessToken } = await generateAccessAndRefreshTokens()
+  const { refreshToken, accessToken } = await generateAccessAndRefreshTokens(req.user._id)
   
   return res
   .status(200)
-  .clearCookie("accessToken", options)
-  .clearCookie("refreshToken", options)
   .cookie("accessToken", accessToken, options)
   .cookie("refreshToken", refreshToken, options)
   
