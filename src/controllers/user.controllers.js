@@ -236,7 +236,9 @@ const refreshAccessToken = asyncHandler( async (req,res) => {
     throw new ApiError(401,"Invalid Token")
   }
   
-  if (token !== decodedToken.refreshToken){
+  const user = await User.findById(decodedToken._id)
+  
+  if (token !== user.refreshToken){
     throw new ApiError(401, "Inavlid or Expired Refresh Token")
   }
   
@@ -248,7 +250,7 @@ const refreshAccessToken = asyncHandler( async (req,res) => {
   .cookie("refreshToken", refreshToken, options)
   .json(
     new ApiResponse(200, {
-      "refreshToken": req.user.refreshToken
+      "refreshToken": refreshToken
     }, "Refreshed The Tokens")
   )
   
