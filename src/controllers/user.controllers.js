@@ -220,14 +220,35 @@ const refreshAccessToken = asyncHandler( async (req,res) => {
   // Use generateAccessAndRefreshTokens() to get accessToken and refreshToken
   // Set new refreshToken and accessToken in cookie
   
-  const { refreshToken, accessToken } = await generateAccessAndRefreshTokens(req.user._id)
+  
+  const token = req.cookies.refreshToken || req.header("Authorization")?.replace("Bearer ", "")
+  
+  if (!token){
+    throw new ApiError(409, "Couldn't find token")
+  }
+  
+  // console.log(token)
+  
+  const decodedToken = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET)
+  
+  if (!decodedToken){
+    throw new ApiError(401,"Invalid Token")
+  }
+  
+  if (token !== decodedToken.refreshToken){
+    throw new ApiError(401, "Inavlid or Expired Refresh Token")
+  }
+  
+  const { refreshToken, accessToken } = await generateAccessAndRefreshTokens(decodedToken._id)
   
   return res
   .status(200)
   .cookie("accessToken", accessToken, options)
   .cookie("refreshToken", refreshToken, options)
   .json(
-    new ApiResponse(200, {}, "Refreshed The Tokens")
+    new ApiResponse(200, {
+      "refreshToken": req.user.refreshToken
+    }, "Refreshed The Tokens")
   )
   
 })
