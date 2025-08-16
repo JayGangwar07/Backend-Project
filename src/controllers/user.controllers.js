@@ -299,7 +299,7 @@ const getDetails = asyncHandler( async (req,res) => {
     new ApiResponse(
       200,
       {
-        data: req.user
+        data: user
       },
     )
   )
@@ -352,11 +352,15 @@ const updateAvatar = asyncHandler(async(req,res) => {
   
   const avatar = await uploadOnCloudinary(avatarLocalPath)
   
+  if (!avatar.url){
+    throw new ApiError(500, "Error while uploading avatar")
+  }
+  
   await User.findByIdAndUpdate(
     req.user._id,
     {
       $set: {
-        avatar
+        avatar: avatar?.url
       }
     }
     )
@@ -365,6 +369,44 @@ const updateAvatar = asyncHandler(async(req,res) => {
   .status(200)
   .json(
     new ApiResponse(200, {data: req.user}, "Avatar Updated")
+  )
+  
+})
+
+const updateCoverImage = asyncHandler(async(req,res) => {
+  
+  /*    STEPS:-    */
+  
+  // verifyJwt()
+  // req.file
+  // uploadOnCloudinary()
+  // findByIdAndUpdate()
+  
+  const coverImageLocalPath = req.file?.path
+  
+  if (!coverImageLocalPath){
+    throw new ApiError(401, "Avatar is required")
+  }
+  
+  const coverImage = await uploadOnCloudinary(avatarLocalPath)
+  
+  if (!coverImage.url){
+    throw new ApiError(500, "Error while uploading cover image")
+  }
+  
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        coverImage: coverImage?.url
+      }
+    }
+    )
+  
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200, {data: req.user}, "cover image Updated")
   )
   
 })
@@ -378,4 +420,5 @@ export {
   getDetails,
   updateDetails,
   updateAvatar,
+  updateCoverImage
   }
