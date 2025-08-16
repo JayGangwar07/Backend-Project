@@ -289,10 +289,93 @@ const changePassword = asyncHandler( async (req,res) => {
   
 })
 
+const getDetails = asyncHandler( async (req,res) => {
+  
+  const user = req.user
+  
+  return req
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      {
+        data: req.user
+      },
+    )
+  )
+})
+
+const updateDetails = asyncHandler(async(req,res) => {
+  
+  const {
+    fullName,
+    email
+  } = req.body
+  
+  if ([fullName,email].some((i)=>i.trim()==="")){
+    throw new ApiError(400,"All Details are required")
+  }
+  
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        fullName,
+        email
+      }
+    },
+    {new: true}
+  ).select("-password -refreshToken")
+  
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200,{user})
+  )
+  
+})
+
+const updateAvatar = asyncHandler(async(req,res) => {
+  
+  /*    STEPS:-    */
+  
+  // verifyJwt()
+  // req.file
+  // uploadOnCloudinary()
+  // findByIdAndUpdate()
+  
+  const avatarLocalPath = req.file?.path
+  
+  if (!avatarLocalPath){
+    throw new ApiError(401, "Avatar is required")
+  }
+  
+  const avatar = await uploadOnCloudinary(avatarLocalPath)
+  
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        avatar
+      }
+    }
+    )
+  
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200, {data: req.user}, "Avatar Updated")
+  )
+  
+})
+
 export {
   registerUser,
   loginUser,
   logoutUser,
   refreshAccessToken,
-  changePassword
+  changePassword,
+  getDetails,
+  updateDetails,
+  updateAvatar,
   }
