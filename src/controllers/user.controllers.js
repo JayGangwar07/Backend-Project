@@ -293,7 +293,7 @@ const getDetails = asyncHandler( async (req,res) => {
   
   const user = req.user
   
-  return req
+  return res
   .status(200)
   .json(
     new ApiResponse(
@@ -356,14 +356,21 @@ const updateAvatar = asyncHandler(async(req,res) => {
     throw new ApiError(500, "Error while uploading avatar")
   }
   
-  await User.findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     req.user._id,
     {
       $set: {
         avatar: avatar?.url
       }
+    },
+    {
+      new: true
     }
     )
+  
+  cloudinary.v2.uploader
+  .destroy(user.avatar)
+  .then(result=>console.log(result))
   
   return res
   .status(200)
@@ -394,14 +401,21 @@ const updateCoverImage = asyncHandler(async(req,res) => {
     throw new ApiError(500, "Error while uploading cover image")
   }
   
-  await User.findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     req.user._id,
     {
       $set: {
         coverImage: coverImage?.url
       }
+    },
+    {
+      new: true
     }
     )
+  
+  cloudinary.v2.uploader
+  .destroy(coverImage)
+  .then(result=>console.log(result));
   
   return res
   .status(200)
