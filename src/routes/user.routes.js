@@ -8,7 +8,9 @@ import {
   getDetails,
   updateDetails,
   updateAvatar,
-  updateCoverImage
+  updateCoverImage,
+  getChannelProfile,
+  getWatchHistory,
   } from "../controllers/user.controllers.js"
 import { verifyJwt } from "../middlewares/auth.middlewares.js"
 import { upload } from "../middlewares/multer.middlewares.js"
@@ -36,9 +38,14 @@ router.route("/refresh").post(refreshAccessToken)
 
 // Secured Routes
 router.route("/change-password").post(verifyJwt, changePassword)
-router.route("/details").post(verifyJwt, getDetails)//
+router.route("/details").post(verifyJwt, getDetails)
 router.route("/change-details").post(verifyJwt, updateDetails)
 router.route("/avatar").post(verifyJwt, upload.single("avatar"), updateAvatar)
 router.route("/cover").post(verifyJwt, upload.single("coverImage"), updateCoverImage)
+//
+router.route("/channel/:username").get(getChannelProfile)
+//
+
+router.route("/history").get(verifyJwt, getWatchHistory)
 
 export default router
