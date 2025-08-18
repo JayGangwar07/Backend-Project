@@ -1,5 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
+import { Subscription } from "../models/subscription.models.js"
 import { User } from "../models/user.models.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
@@ -498,10 +499,12 @@ const getChannelProfile = asyncHandler(async (req,res) => {
 })
 
 const getWatchHistory = asyncHandler( async (req,res) => {
-  
+  /*
   const user = await User.aggregate([
     {
-      $match: new mongoose.Types.ObjectId(req.user._id)
+      $match: {
+        _id: new mongoose.Types.ObjectId("689fe34308d00fbf1aa23b23")
+      }
     },
     {
       $lookup: {
@@ -538,6 +541,53 @@ const getWatchHistory = asyncHandler( async (req,res) => {
       }
     }
   ])
+  */
+  
+
+  const user = await User.aggregate([
+        {
+            $match: {
+              _id: new mongoose.Types.ObjectId(req.user._id),
+               // _id: new mongoose.Types.ObjectId("689fe34308d00fbf1aa23b23")
+            }
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        fullName: 1,
+                                        username: 1,
+                                        avatar: 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields:{
+                            owner:{
+                                $first: "$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+  
+  console.log(user)
   
   return res
   .status(200)

@@ -42,10 +42,8 @@ router.route("/details").post(verifyJwt, getDetails)
 router.route("/change-details").post(verifyJwt, updateDetails)
 router.route("/avatar").post(verifyJwt, upload.single("avatar"), updateAvatar)
 router.route("/cover").post(verifyJwt, upload.single("coverImage"), updateCoverImage)
-//
-router.route("/channel/:username").get(getChannelProfile)
-//
 
+router.route("/channel/:username").get(verifyJwt, getChannelProfile)
 router.route("/history").get(verifyJwt, getWatchHistory)
 
 export default router
