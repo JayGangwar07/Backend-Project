@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
 
-export const verifyJwt = asyncHandler( async (req,res,next) => {
+export const verifyJWT = asyncHandler( async (req,res,next) => {
   
   // Authorization Bearer <token>
   try{

@@ -1,7 +1,14 @@
 import mongoose from "mongoose"
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2"
+import { nanoid } from "nanoid"
 
 const videoSchema = new mongoose.Schema({
+  
+  vidId: {
+    type: String,
+    unique: true,
+    default: () => nanoid(5)
+  },
   
   videoFile: {
     type: String, //Cloudinary
