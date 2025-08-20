@@ -6,8 +6,8 @@ const videoSchema = new mongoose.Schema({
   
   vidId: {
     type: String,
+    default: () => nanoid(5),
     unique: true,
-    default: () => nanoid(5)
   },
   
   videoFile: {
@@ -42,7 +42,7 @@ const videoSchema = new mongoose.Schema({
   
   isPublished: {
     type: Boolean,
-    deafult: true
+    default: true
   },
   
   owner: {
