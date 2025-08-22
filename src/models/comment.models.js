@@ -8,7 +8,7 @@ const commentSchema = new Schema(
             required: true
         },
         video: {
-            type: Schema.Types.ObjectId,
+            type: String,
             ref: "Video"
         },
         owner: {

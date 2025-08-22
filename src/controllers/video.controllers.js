@@ -275,9 +275,9 @@ const deleteVideo = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Video does not exist")
   }
   
-  /*if (req.user?._id !== video.owner){
+  if (req.user?._id !== video.owner){
     throw new ApiError(400, "Unauthorised request")
-  }*/
+  }
   
   await Video.deleteOne({vidId: videoId})
   
@@ -298,9 +298,9 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Video not found")
   }
   
-  /*if (req.user?._id !== video.owner){
+  if (req.user?._id !== video.owner){
     throw new ApiError(400, "Unauthorised request")
-  }*/
+  }
   
   
   video.isPublished = !video.isPublished

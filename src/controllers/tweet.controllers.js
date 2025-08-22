@@ -6,11 +6,48 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
 const createTweet = asyncHandler(async (req, res) => {
-    //TODO: create tweet
+  //TODO: create tweet
+  
+  /*    STEPS:-    */
+  
+  // Auth middleware
+  // get content
+  // Create document
+  
+  const {content} = req.body
+  
+  if (!content.trim()){
+    throw new ApiError(400, "Content is required")
+  }
+  
+  /*if (!req.user._id){
+    throw new ApiError(400, "Unauthorised request")
+  }*/
+  
+  const tweet = await Tweet.create({
+    owner: req.user?._id,
+    content,
+  })
+  
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200, tweet, "Tweet Posted")
+  )
+  
 })
 
 const getUserTweets = asyncHandler(async (req, res) => {
-    // TODO: get user tweets
+  // TODO: get user tweets
+  
+  /*    STEPS:-    */
+  
+  // get user _id
+  // aggregate for like and subscribers and comments owner details
+  // display res
+  
+  
+  
 })
 
 const updateTweet = asyncHandler(async (req, res) => {
