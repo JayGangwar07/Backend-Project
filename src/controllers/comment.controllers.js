@@ -1,5 +1,6 @@
 import mongoose from "mongoose"
 import {Comment} from "../models/comment.models.js"
+import {Video} from "../models/video.models.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
@@ -9,30 +10,61 @@ const getVideoComments = asyncHandler(async (req, res) => {
   const {videoId} = req.params
   const {page = 1, limit = 10} = req.query
   
-  const commentAggregate = await Comment.aggregate([
+  /*const commentAggregate = await Comment.aggregate([
+    {
+      $match: {
+        video: videoId
+      }
+    }
+  ])*/
+  
+  const pipeline = [
     {
       $match: {
         video: videoId
       }
     },
     {
+      $sort: {
+        createdAt: -1
+      }
+    },
+    {
       $lookup: {
         from: "users",
         localField: "owner",
-        foreignFiels: "_id",
-        as: "owner"
+        foreignField: "_id",
+        as: "owner",
+        pipeline: [
+          {
+      $project: {
+        username: 1,
+        email: 1,
+        avatar: 1,
+        // ↓ Not required but just in case
+        fullName: 1,
+        coverImage: 1,
       }
     }
-  ])
+        ]
+      }
+    },
+  ]
   
   await Comment
-  .aggregatePaginate(commentAggregate, page, limit)
+  .aggregatePaginate(pipeline, {page, limit})
   .then((results)=>{
-    console.log(results)
+  console.log(results)
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200, results, "Fetched all comments of this video")
+  )
   })
   .catch((err)=>{
     throw err
   })
+
 
 })
 
@@ -48,6 +80,14 @@ const addComment = asyncHandler(async (req, res) => {
   
   if (!content.trim() || !videoId.trim()){
     throw new ApiError(400, "Content and video id are required")
+  }
+  
+  const video = await Video.findById({
+    vidId: videoId
+  })
+  
+  if (!video){
+    throw new ApiError(400, "Video does not exist")
   }
   
   const comment = await Comment.create({
