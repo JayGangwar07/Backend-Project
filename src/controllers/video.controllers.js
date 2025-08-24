@@ -90,7 +90,7 @@ const getVideoById = asyncHandler(async (req, res) => {
     {
       $lookup: {
         from: "likes",
-        localField: "_id",
+        localField: "vidId",
         foreignField: "video",
         as: "likes"
       }

@@ -8,6 +8,7 @@ const videoSchema = new mongoose.Schema({
     type: String,
     default: () => nanoid(5),
     unique: true,
+    index: true
   },
   
   videoFile: {
