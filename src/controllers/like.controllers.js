@@ -156,7 +156,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
   const likes = await Like.aggregate([
     {
       $match: {
-        likedBy: new mongoose.Types.ObjectId(req.user._id)
+        likedBy: new mongoose.Types.ObjectId("689fe34308d00fbf1aa23b23")
       }
     },
     {
@@ -174,9 +174,6 @@ const getLikedVideos = asyncHandler(async (req, res) => {
             as: "ownerDetails"
           }
           },
-          {
-            $unwind: "$ownerDetails"
-          }
         ]
       }
     },
@@ -185,7 +182,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     },
     {
       $sort: {
-        "likedVideos.createdAt": -1
+        createdAt: -1
       }
     },
     {
@@ -210,6 +207,8 @@ const getLikedVideos = asyncHandler(async (req, res) => {
       }
     },
   ])
+  
+  console.log(likes)
   
   return res
   .status(200)
