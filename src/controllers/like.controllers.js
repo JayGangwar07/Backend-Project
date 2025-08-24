@@ -145,18 +145,11 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 
 const getLikedVideos = asyncHandler(async (req, res) => {
   //TODO: get all liked videos
-  
-  /*const likes = await Like.find({
-    video: {
-      $exists: true
-    },
-    likedBy: req.user._id
-  })*/
-  
+
   const likes = await Like.aggregate([
     {
       $match: {
-        likedBy: new mongoose.Types.ObjectId("689fe34308d00fbf1aa23b23")
+        likedBy: new mongoose.Types.ObjectId(req.user._id)
       }
     },
     {
@@ -164,46 +157,40 @@ const getLikedVideos = asyncHandler(async (req, res) => {
         from: "videos",
         localField: "video",
         foreignField: "vidId",
-        as: "likedVideos",
+        as: "videoData",
         pipeline: [
           {
+            $project: {
+              thumbnail: 1,
+              title: 1,
+              duration: 1,
+              createdAt: 1,
+              views: 1,
+              owner: 1,
+            }
+          },
+          {
             $lookup: {
-            from: "users",
-            localField: "owner",
-            foreignField: "_id",
-            as: "ownerDetails"
-          }
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "ownerDetails",
+              pipeline: [
+                {
+                  $project: {
+                    avatar: 1,
+                    username: true
+                  },
+                }
+              ]
+            }
           },
         ]
       }
     },
     {
-      $unwind: "$likedVideos"
-    },
-    {
       $sort: {
         createdAt: -1
-      }
-    },
-    {
-      $project: {
-        _id: 0,
-        likedVideos: {
-          _id: 1,
-          vidId: 1,
-          videoFile: 1,
-          thumbnail: 1,
-          title: 1,
-          description: 1,
-          duration: 1,
-          createdAt: 1,
-          isPublished: 1,
-          ownerDetails: {
-            username: 1,
-            coverImg: 1,
-            avatar: 1
-          }
-        }
       }
     },
   ])
