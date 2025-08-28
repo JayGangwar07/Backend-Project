@@ -10,14 +10,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
   const {videoId} = req.params
   const {page = 1, limit = 10} = req.query
   
-  /*const commentAggregate = await Comment.aggregate([
-    {
-      $match: {
-        video: videoId
-      }
-    }
-  ])*/
-  
+
   const pipeline = [
     {
       $match: {

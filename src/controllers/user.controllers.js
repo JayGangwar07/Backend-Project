@@ -499,50 +499,7 @@ const getChannelProfile = asyncHandler(async (req,res) => {
 })
 
 const getWatchHistory = asyncHandler( async (req,res) => {
-  /*
-  const user = await User.aggregate([
-    {
-      $match: {
-        _id: new mongoose.Types.ObjectId("689fe34308d00fbf1aa23b23")
-      }
-    },
-    {
-      $lookup: {
-        from: "videos",
-        localField: "watchHistory",
-        foreignField: "_id",
-        as: "owner",
-        pipeline: [
-          {
-            $lookup: {
-              from: "users",
-              localField: "owner",
-              foreignField: "_id",
-              as: "owner",
-              pipeline: [
-                {
-                  $project: {
-                    username: 1,
-                    avatar: 1,
-                    fullName: 1,
-                  }
-                },
-              ]
-            }
-          },
-          {
-                  $addFields: {
-                    owner: {
-                      $first: "$owner"
-                    }
-                  }
-                }
-        ]
-      }
-    }
-  ])
-  */
-  
+
 
   const user = await User.aggregate([
         {
@@ -555,7 +512,7 @@ const getWatchHistory = asyncHandler( async (req,res) => {
             $lookup: {
                 from: "videos",
                 localField: "watchHistory",
-                foreignField: "_id",
+                foreignField: "vidId",
                 as: "watchHistory",
                 pipeline: [
                     {

@@ -69,7 +69,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
   
   const existingLike = await Like.findOne({
     comment: commentId,
-    likedBy: req.user?._id
+    likedBy: req.user._id
   })
   
   console.log(existingLike)

@@ -9,9 +9,69 @@ import { nanoid } from "nanoid"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
-    //TODO: get all videos based on query, sort, pagination
+  //TODO: get all videos based on query, sort, pagination
+  
+  const {
+    page = 1,
+    limit = 10,
+    query,
+    sortBy = "createdAt",
+    sortType = "desc",
+    userId 
+  } = req.query
+  
+  let filter = {}
+  
+  if (query) {
+    filter.$or = [
+      { title: { $regex: query, $options: "i" } },
+      { description: { $regex: query, $options: "i" } }
+    ]
+  }
+  
+  
+  const sortStage = {[sortBy]: sortType === "asc" ? 1 : -1}
+  
+  if (userId) filter.uploadedBy = userId
+  
+  const skip = (page - 1)*limit
+  
+  const videos = await Video.aggregate([
+    {
+      $match: filter
+    },
+    {
+      $sort: sortStage
+    },
+    {
+      $skip: skip
+    },
+    {
+      $limit: Number(limit)
+    }
+  ])
+  
+  const totalVideosCount = await Video.aggregate([
+    {
+      $match : filter
+    },
+    {
+      $count: "total"
+    }
+  ])
+  
+  const total = totalVideosCount[0].total
+  
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200, {total,videos}, "Fetched videos")
+  )
+
 })
+
+
 
 const publishAVideo = asyncHandler(async (req, res) => {
   /*  DONE  */
@@ -53,7 +113,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
     description,
     vidId: nanoid(5),
     isPublished: true,
-    owner: "689fe34308d00fbf1aa23b23",
+    owner: req.user._id,
     duration: video.duration,
   })
   
@@ -125,7 +185,7 @@ const getVideoById = asyncHandler(async (req, res) => {
               isSubscribed: {
                 $cond: {
                   if : {
-                    $in: [new mongoose.Types.ObjectId(req.user?._id), "$subscribers.subscriber"]
+                    $in: [new mongoose.Types.ObjectId(req.user._id), "$subscribers.subscriber"]
                   },
                   then: true,
                   else: false
@@ -155,7 +215,7 @@ const getVideoById = asyncHandler(async (req, res) => {
         },
         isLiked: {
           $cond: {
-            if: {$in: [new mongoose.Types.ObjectId(req.user?._id),"$likes.likedBy"]},
+            if: {$in: [new mongoose.Types.ObjectId(req.user._id),"$likes.likedBy"]},
             then: true,
             else: false
           }
@@ -181,7 +241,7 @@ const getVideoById = asyncHandler(async (req, res) => {
   
   console.log(video)
   
-  if (!video.length){
+  if (!video?.length){
     throw new ApiError(400, "Video Not Found")
   }
   
@@ -194,7 +254,7 @@ const getVideoById = asyncHandler(async (req, res) => {
   })
   
   await User.findOneAndUpdate({
-    _id: req.user?._id
+    _id: req.user._id
   },{
     $addToSet: {
       watchHistory: videoId
@@ -204,7 +264,7 @@ const getVideoById = asyncHandler(async (req, res) => {
   return res
   .status(200)
   .json(
-    new ApiResponse(200, video, "Video feteched")
+    new ApiResponse(200, video, "Video fetched")
   )
   
 })
