@@ -9,11 +9,15 @@ import { v2 as cloudinary } from "cloudinary"
 import mongoose from "mongoose"
 
 
-/* Global Variable */
+const dev = process.env.NODE_ENV !== "production";
+
 const options = {
   httpOnly: true,
-  secure: true
-}
+  secure: !dev,              // false on localhost (http), true in production (https)
+  sameSite: dev ? "lax" : "none"  // lax works locally, none required for cross-site in prod
+};
+
+
 
 const generateAccessAndRefreshTokens = async (userId) => {
   
@@ -145,6 +149,7 @@ const loginUser = asyncHandler( async (req,res) => {
     password
   } = req.body
   
+
   if (!password){
     throw new ApiError(401,"Password is required")
   }
@@ -180,10 +185,13 @@ const loginUser = asyncHandler( async (req,res) => {
 }
   */
   
+  console.log(req.cookies)
+  
+  res.cookie("accessToken", accessToken, options)
+  res.cookie("refreshToken", refreshToken, options)
+  
   return res
   .status(200)
-  .cookie("accessToken", accessToken, options)
-  .cookie("refreshToken", refreshToken, options)
   .json(
     new ApiResponse(
       200,
