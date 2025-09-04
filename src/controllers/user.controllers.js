@@ -12,6 +12,8 @@ import mongoose from "mongoose"
 const dev = process.env.NODE_ENV !== "production";
 
 const options = {
+  path: "/",
+  maxAge: 604800,
   httpOnly: true,
   secure: !dev,              // false on localhost (http), true in production (https)
   sameSite: dev ? "lax" : "none"  // lax works locally, none required for cross-site in prod
@@ -512,8 +514,8 @@ const getWatchHistory = asyncHandler( async (req,res) => {
   const user = await User.aggregate([
         {
             $match: {
-              _id: new mongoose.Types.ObjectId(req.user._id),
-               // _id: new mongoose.Types.ObjectId("689fe34308d00fbf1aa23b23")
+              //_id: new mongoose.Types.ObjectId(req.user._id),
+              _id: new mongoose.Types.ObjectId("689fe34308d00fbf1aa23b23")
             }
         },
         {
