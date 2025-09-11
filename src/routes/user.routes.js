@@ -44,7 +44,7 @@ router.route("/login").post(loginUser)
 
 // Secured Routes
 router.route("/logout").post(verifyJWT, logoutUser)
-router.route("/refresh").post(refreshAccessToken)
+router.route("/refresh").post(verifyJWT, refreshAccessToken)
 
 // Secured Routes
 router.route("/change-password").post(verifyJWT, changePassword)

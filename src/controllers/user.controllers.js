@@ -13,7 +13,7 @@ const dev = process.env.NODE_ENV !== "production";
 
 const options = {
   path: "/",
-  maxAge: 604800,
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
   httpOnly: true,
   secure: !dev,              // false on localhost (http), true in production (https)
   sameSite: dev ? "lax" : "none"  // lax works locally, none required for cross-site in prod
@@ -191,6 +191,9 @@ const loginUser = asyncHandler( async (req,res) => {
   
   res.cookie("accessToken", accessToken, options)
   res.cookie("refreshToken", refreshToken, options)
+  
+  console.log(res.getHeaders());
+
   
   return res
   .status(200)

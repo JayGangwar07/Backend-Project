@@ -5,6 +5,53 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
+const getAllTweets = asyncHandler(async(req,res) => {
+  
+  //const tweets = await Tweet.find()
+  
+  const tweets = await Tweet.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner"
+      }
+    },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "tweet",
+        as: "likes"
+      }
+    },
+    {
+      $lookup: {
+        from: "comments",
+        localField: "_id",
+        foreignField: "comments",
+        as: "comments"
+      }
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "owner._id",
+        foreignField: "channel",
+        as: "subscribers"
+      }
+    }
+  ])
+  
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200, tweets, "All Tweets Fetched")
+  )
+  
+})
+
 const createTweet = asyncHandler(async (req, res) => {
   //TODO: create tweet
   
@@ -25,8 +72,8 @@ const createTweet = asyncHandler(async (req, res) => {
   }*/
   
   const tweet = await Tweet.create({
-    owner: req.user._id,
-    //owner: "689fe34308d00fbf1aa23b23",
+    //owner: req.user._id,
+    owner: new mongoose.Types.ObjectId('689fe34308d00fbf1aa23b23'),
     content,
   })
   
@@ -176,6 +223,7 @@ const deleteTweet = asyncHandler(async (req, res) => {
 })
 
 export {
+    getAllTweets,
     createTweet,
     getUserTweets,
     updateTweet,

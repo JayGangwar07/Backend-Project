@@ -94,7 +94,7 @@ userSchema.methods.generateRefreshToken = async function(){
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
-      //expiresIn: "7d"
+      //expiresIn: "10d"
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY
     }
   )

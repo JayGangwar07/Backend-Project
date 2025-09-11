@@ -41,6 +41,14 @@ const getAllVideos = asyncHandler(async (req, res) => {
       $match: filter
     },
     {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner"
+      }
+    },
+    {
       $sort: sortStage
     },
     {
@@ -53,11 +61,11 @@ const getAllVideos = asyncHandler(async (req, res) => {
   
   const totalVideosCount = await Video.aggregate([
     {
-      $match : filter
+      $match: filter,
     },
     {
       $count: "total"
-    }
+    },
   ])
   
   const total = totalVideosCount[0].total

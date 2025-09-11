@@ -11,6 +11,8 @@ const toggleSubscription = asyncHandler(async (req, res) => {
   
   const {channelId} = req.params
   
+  console.log(channelId)
+  
   if (!isValidObjectId(channelId)){
     throw new ApiError(400, "Invalid channel")
   }

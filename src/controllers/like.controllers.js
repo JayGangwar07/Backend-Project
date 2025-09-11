@@ -5,6 +5,89 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
+const isVideoLiked = asyncHandler(async (req,res) => {
+  
+  const {videoId} = req.params
+  
+  const like = await Like.findOne({
+    video: videoId,
+    likedBy: req.user._id
+    //likedBy: new mongoose.Types.ObjectId("689fe34308d00fbf1aa23b23")
+  })
+  
+  if (!like){
+    return res
+    .status(200)
+    .json(
+      new ApiResponse(200, false)
+    )
+  }
+  
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200, true)
+  )
+  
+})
+
+const tweetLikes = asyncHandler(async (req,res) => {
+  
+  const {tweetId} = req.params
+  
+  if (!isValidObjectId(tweetId)){
+    throw new ApiError(500, "Inavlid tweetId")
+  }
+  
+  const likes = await Like.aggregate([
+    {
+      $match: {
+        tweet: new mongoose.Types.ObjectId(tweetId)
+      }
+    },
+    {
+      $count: "total"
+    }
+  ])
+  
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200, likes, "Fetched all likes of tweet")
+  )
+  
+})
+
+const isTweetLiked = asyncHandler(async (req,res) => {
+  
+  const {tweetId} = req.params
+  
+  if (!isValidObjectId(tweetId)){
+    throw new ApiError(400, "Invalid tweet id")
+  }
+  
+  const like = await Like.findOne({
+    tweet: tweetId,
+    likedBy: req.user._id
+    //likedBy: new mongoose.Types.ObjectId("689fe34308d00fbf1aa23b23")
+  })
+  
+  if (!like){
+    return res
+    .status(200)
+    .json(
+      new ApiResponse(200, false)
+    )
+  }
+  
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200, true)
+  )
+  
+})
+
 const toggleVideoLike = asyncHandler(async (req, res) => {
   //TODO: toggle like on video
   
@@ -89,7 +172,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
   
   const like = await Like.create({
     comment: commentId,
-    likedBy: req.user?._id
+    likedBy: req.user._id
   })
   
   return res
@@ -128,10 +211,11 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     )
     
   }
-  
+
   const like = await Like.create({
     tweet: tweetId,
     likedBy: req.user._id
+    //likedBy: new mongoose.Types.ObjectId("689fe34308d00fbf1aa23b23")
   })
   
   return res
@@ -206,6 +290,9 @@ const getLikedVideos = asyncHandler(async (req, res) => {
 })
 
 export {
+  isVideoLiked,
+  tweetLikes,
+  isTweetLiked,
   toggleCommentLike,
   toggleTweetLike,
   toggleVideoLike,

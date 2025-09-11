@@ -42,6 +42,14 @@ const getVideoComments = asyncHandler(async (req, res) => {
         ]
       }
     },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "comment",
+        as: "likes"
+      }
+    },
   ]
   
   await Comment
@@ -75,7 +83,7 @@ const addComment = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Content and video id are required")
   }
   
-  const video = await Video.findById({
+  const video = await Video.find({
     vidId: videoId
   })
   
@@ -87,6 +95,7 @@ const addComment = asyncHandler(async (req, res) => {
     content,
     video: videoId,
     owner: req.user._id
+    //owner: new mongoose.Types.ObjectId("689fe34308d00fbf1aa23b23")
   })
   
   if (!comment){
