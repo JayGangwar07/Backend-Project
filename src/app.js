@@ -4,11 +4,12 @@ import cookieParser from "cookie-parser"
 
 const app = express()
 const allowedOrigins = [
-  "http://localhost:5173"
+  "http://localhost:5173",
+  "https://jaycomet.vercel.app"
 ];
 
 app.use(cors({
-  origin: "https://jaycomet.vercel.app",   // frontend URL
+  origin: allowedOrigins,   // frontend URL
   credentials: true
 }));
 
