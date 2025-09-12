@@ -8,7 +8,7 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: "http://localhost:5173",   // frontend URL
+  origin: "https://jaycomet.vercel.app",   // frontend URL
   credentials: true
 }));
 
